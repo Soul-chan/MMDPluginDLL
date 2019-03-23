@@ -1,0 +1,3 @@
+mmd_plugin.hはおいがみ様の MMDPlugin ver0.41 64bit版 開発者用
+https://bowlroll.net/file/135503 を改変したものです。
+ビルドするにはこのフォルダに同梱されている MMDPlugin.lib を配置してください。
