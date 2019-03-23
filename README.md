@@ -2,10 +2,11 @@
 おいがみ様の MMDPlugin で使えるMMDのプラグインです。  
 今のところDLLは1つです。  
 
+
 #### 使用方法  
 MMDをおいがみ様の MMDPlugin(https://bowlroll.net/file/121761) を使える状態にしてください。  
 MMDのバージョンは v931x64 以外では使えません。  
-Plugin フォルダにDLLを入れてください。  
+[ここ](https://github.com/Soul-chan/MMDPluginDLL/releases/download/1.0.0.0/MMDPluginDLL_1.0.0.0.zip)からダウンロードした qCameraModeUndo.dll を Plugin フォルダに入れてください。  
 
 #### ビルド方法
 ビルドにはおいがみ様の MMDPlugin ver0.41 64bit版 開発者用(https://bowlroll.net/file/135503) が必要です。  
@@ -44,6 +45,10 @@ MMDのカメラモードでキーフレームの元に戻す/やり直しが出�
 バッファ上限は実用上は10MBもあれば十分な気もしますが、念のため100MBをデフォルトにしています。  
 100MBで大体カメラの上限キーフレーム数である1万フレーム分の操作を140回程保存できます。  
 1フレームの操作なら約140万回分です。  
+
+#### 更新履歴
+・qCameraModeUndo.dll  
+  1.0.0.0 初版公開  
 
 #### ライセンス
 GitHubでのライセンスは一番緩そうな[MIT](https://github.com/Soul-chan/MMDPluginDLL/blob/master/LICENSE)ライセンスにしています。  
