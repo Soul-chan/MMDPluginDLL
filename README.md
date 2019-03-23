@@ -31,7 +31,7 @@ MMDのカメラモードでキーフレームの元に戻す/やり直しが出�
     アクセサリのやり直し  Ctrl + Shift + X  
 
 初回起動時にDLLと同じフォルダに qCameraModeUndo.ini が作られます。  
-個のファイルを編集することでキーボードショートカット等の設定が可能です。
+このファイルを編集することでキーボードショートカット等の設定が可能です。
 
     AccessoryRedo=Ctrl + Shift + X  アクセサリのやり直しの設定です
     AccessoryUndo=Ctrl + Shift + Z  アクセサリの元に戻すの設定です
@@ -46,7 +46,7 @@ MMDのカメラモードでキーフレームの元に戻す/やり直しが出�
 1フレームの操作なら約140万回分です。  
 
 #### ライセンス
-GitHubでのライセンスは一番緩そうな[MIT](https://github.com/Soul-chan/MMDPluginDLL/blob/master/LICENSE)ライセンスにしています。
+GitHubでのライセンスは一番緩そうな[MIT](https://github.com/Soul-chan/MMDPluginDLL/blob/master/LICENSE)ライセンスにしています。  
 基本的には好きにしていただいて構いません。  
 プルリクエストも頂けるなら大歓迎です。  
 
