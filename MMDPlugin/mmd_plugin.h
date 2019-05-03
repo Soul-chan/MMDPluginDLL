@@ -1206,7 +1206,8 @@ namespace mmp
     int __unknown49[1];
     float counter_f;
     int counter;
-    int __unknown50[3];
+    int __unknown50[2];
+	int is_playing;						// 再生中かどうか 0:停止中 1:再生中
     Float3 xyz;
     int __unknown60[22];
     CameraKeyFrameData(&camera_key_frame)[10000];
@@ -1235,7 +1236,7 @@ namespace mmp
     int left_frame;
     int __unknown90;
     int pre_left_frame;
-    int now_frame;
+    int now_frame;							// 現在のフレーム
     int __unknown100[160800];
     char __unknown101;
     unsigned char edit_interpolation_curve[4]; // x1 y1 x2 y2
@@ -1248,7 +1249,9 @@ namespace mmp
     int select_accessory;					// 「アクセサリ操作」パネル選択中のアクセサリの accessory_data や accessory_key_frames のインデックス コンボボックスの順番ではない アクセサリが1つも読み込まれていない場合も0が入っている
     int __unknown104[29];
     float view_angle;						// 視野角(度数) 書き換えても反映されるわけではない
-    int __unknown105[2224];
+    int __unknown105[290];
+	float play_sec;							// 再生中の先頭からの秒数 *30 でフレーム数になる 停止中は値は変わらない
+	int __unknown106[1933];
     char is_camera_select;					// カメラモードのタイムラインで「カメラ」行が選択状態なら1
     char is_light_select;					// カメラモードのタイムラインで「照明」行が選択状態なら1
     char is_self_shadow_select;				// カメラモードのタイムラインで「セルフ影」行が選択状態なら1

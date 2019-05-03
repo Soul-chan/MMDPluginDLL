@@ -18,6 +18,8 @@ Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "MikuMikuDance", "D:\MMD\Mik
 		AttachLaunchAction = No
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DispPlayingFrame", "DispPlayingFrame\DispPlayingFrame.vcxproj", "{CD53A5BB-422A-4A94-A803-FE78CBB82632}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -30,6 +32,10 @@ Global
 		{765786C6-AB9C-432B-AF73-C122A3D5CCD0}.Release|x64.Build.0 = Release|x64
 		{EA89FFE5-5742-4907-8BAC-7BC82428547B}.Debug|x64.ActiveCfg = Release|x64
 		{EA89FFE5-5742-4907-8BAC-7BC82428547B}.Release|x64.ActiveCfg = Release|x64
+		{CD53A5BB-422A-4A94-A803-FE78CBB82632}.Debug|x64.ActiveCfg = Debug|x64
+		{CD53A5BB-422A-4A94-A803-FE78CBB82632}.Debug|x64.Build.0 = Debug|x64
+		{CD53A5BB-422A-4A94-A803-FE78CBB82632}.Release|x64.ActiveCfg = Release|x64
+		{CD53A5BB-422A-4A94-A803-FE78CBB82632}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

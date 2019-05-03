@@ -10,6 +10,7 @@
 #include "../MMDPlugin/mmd_plugin.h"
 using namespace mmp;
 
+#include "../Common/Def.h"
 #include "../Common/CUnknownChecker.h"
 #include "../Common/CInifile.h"
 #include "../Common/CKeyState.h"
@@ -1097,14 +1098,8 @@ private:
 	// 「元に戻す」ボタンと「やり直し」ボタンのコントロールID
 	static constexpr int UNDO_BTN_CTRL_ID = 0x190;
 	static constexpr int REDO_BTN_CTRL_ID = 0x191;
-	// カメラ用に自作する「元に戻す」ボタンと「やり直し」ボタンのコントロールID
-	static constexpr int MY_CAM_UNDO_BTN_CTRL_ID = 0xA190;
-	static constexpr int MY_CAM_REDO_BTN_CTRL_ID = 0xA191;
-	// アクセサリ用に自作する「元に戻す」ボタンと「やり直し」ボタンのコントロールID
-	static constexpr int MY_ACC_UNDO_BTN_CTRL_ID = 0xB190;
-	static constexpr int MY_ACC_REDO_BTN_CTRL_ID = 0xB191;
 public:
-	const char* getPluginTitle() const override { return "MMDUtility_CameraUndo"; }
+	const char* getPluginTitle() const override { return "CameraModeUndo"; }
 
 	CameraModeUndoPlugin()
 		: m_mmdDataP(nullptr)
@@ -1221,7 +1216,7 @@ public:
 			_dbgPrint("-----------------------------");
 			// CUnknownChecker::Copy();
 			// CUnknownChecker::Check();
-			m_camUndoP->CreateDummyData();
+			// m_camUndoP->CreateDummyData();
 		}
 #endif // USE_DEBUG
 

@@ -71,6 +71,8 @@ public:
 		ARY_CHECK(__unknown103, %d);
 		ARY_CHECK(__unknown104, %d);
 		ARY_CHECK(__unknown105, %d);
+		ARY_CHECK(__unknown106, %d);
+		ARY_CHECK(__unknown109, %d);
 		ARY_CHECK(__unknown110, %d);
 		ARY_CHECK(__unknown120, %d);
 
@@ -80,6 +82,7 @@ public:
 			_dbgPrint( "違う " #name " " #fmt "!=" #fmt, copyP->name, mmd_data->name);	\
 		}
 
+		VAL_CHECK(__unknown30, %d);
 		VAL_CHECK(__unknown71, %f);
 		VAL_CHECK(__unknown90, %d);
 		VAL_CHECK(left_frame, %d);
@@ -92,12 +95,17 @@ public:
 		
 		_dbgPrint("mmd_data:%p - %p size:%d", mmd_data, mmd_data +1, sizeof(*mmd_data));
 		_dbgPrint("__unknown40:%p", mmd_data->__unknown40);
+		_dbgPrint("__unknown49:%p", mmd_data->__unknown49);
+		_dbgPrint("__unknown50:%p", mmd_data->__unknown50);
+		_dbgPrint("__unknown60:%p", mmd_data->__unknown60);
 		_dbgPrint("__unknown70:%p", mmd_data->__unknown70);
 		_dbgPrint("__unknown100:%p", mmd_data->__unknown100);
 		_dbgPrint("__unknown101:%p", &mmd_data->__unknown101);
 		_dbgPrint("__unknown103:%p", mmd_data->__unknown103);
 		_dbgPrint("__unknown104:%p", mmd_data->__unknown104);
 		_dbgPrint("__unknown105:%p", mmd_data->__unknown105);
+		_dbgPrint("__unknown106:%p", mmd_data->__unknown106);
+		_dbgPrint("__unknown109:%p", mmd_data->__unknown109);
 		_dbgPrint("__unknown110:%p", mmd_data->__unknown110);
 		_dbgPrint("__unknown120:%p", mmd_data->__unknown120);
 	}
