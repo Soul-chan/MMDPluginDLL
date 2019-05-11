@@ -1071,7 +1071,9 @@ namespace mmp
   {
     char name_jp[20];
     char name_en[20];
-    int __unknown10[5];
+    wchar_t *wname_jp;					// ポインタなので構造体の先頭がwchar_tの名前と言うだけかもしれない こっちは20文字以上でも最後まで入っている 1300文字くらいまでは確認
+    wchar_t *wname_en;
+    int parent_bone;					// 親ボーンのインデックス
     D3DMATRIX __unknown_mat[4];
     float init_x, init_y, init_z;
     float x, y, z;
@@ -1079,7 +1081,59 @@ namespace mmp
     float __unknown20_rotation_q[4];
     float x2, y2, z2;
     float __unknown30_rotation_q[4];
-    int __unknown30[56];
+    int __unknown30[17];
+    int to_bone;						// 接続先ボーンのインデックス なしの場合は-1 ConnectToBone が立っている時のみ有効 ボーン総数より大きい値を入力されている場合は不定
+    Float3 to_offset;					// ボーン位置からの相対オフセット ConnectToBone が立っていない時のみ有効 xが-1された値で入っている (0,0,0)を入力した場合(-1,0,0)
+    int __unknown38[3];
+    int append_parent_bone;				// 回転付与/移動付の「付与親ボーンのインデックス」
+    int __unknown39;
+    int level;							// 物理後変形の「変形階層」
+
+    enum BoneFlag : short
+    {
+      ConnectToBone				= 1<< 0, // 0x0001  : 接続先(PMD子ボーン指定)表示方法 -> 0:座標オフセットで指定 1:ボーンで指定
+      Rotation					= 1<< 1, // 0x0002  : 回転可能(回転 ボタン)
+      Translation				= 1<< 2, // 0x0004  : 移動可能(移動 ボタン)
+      Visible					= 1<< 3, // 0x0008  : 表示(表示 ボタン)
+      Controllable				= 1<< 4, // 0x0010  : 操作可(操作 ボタン)
+      IK						= 1<< 5, // 0x0020  : IK(IK ボタン)
+      __None__					= 1<< 6,
+      AppendLocal				= 1<< 7, // 0x0080  : ローカル付与 | 付与対象 0:ユーザー変形値／IKリンク／多重付与 1:親のローカル変形量(付与親：L ボタン)
+      AppendRotation			= 1<< 8, // 0x0100  : 回転付与(付与：回転+ ボタン)
+      AppendTranslation			= 1<< 9, // 0x0200  : 移動付与(付与：移動+ ボタン)
+      FixAxis					= 1<<10, // 0x0400  : 軸固定(軸制限 ボタン)
+      LocalFrame				= 1<<11, // 0x0800  : ローカル軸(ローカル軸 ボタン)
+      AfterPhysics				= 1<<12, // 0x1000  : 物理後変形(物理後 ボタン)
+      External					= 1<<13, // 0x2000  : 外部親変形(外部親 ボタン)
+    };
+    BoneFlag flg;						// ボーンフラグ
+    char pad[2];						// パディング
+
+    float append_ratio;					// 回転付与/移動付の「付与率」
+
+    Float3 fix_axis;					// 軸固定の「軸の方向ベクトル」そのままではなく正規化された値が入っている
+
+    Float3 local_axis_x;				// ローカル軸の「X軸の方向ベクトル」 PMXEで計算済みの値
+    Float3 local_axis_z;				// ローカル軸の「Z軸の方向ベクトル」 PMXEで計算済みの値
+
+    int external_key;					// 外部親変形の「親Key」
+
+    int ik_target_bone;					// IKターゲットボーンのインデックス
+    int ik_loop_count;					// IKループ回数
+    float ik_unit_angle;				// IKループ計算時の1回あたりの単位角度(ラジアン)
+    int ik_link_count;					// IKリンク数 : 後続のik_link[]要素数
+    int __unknown48;
+	
+    // IKリンク
+    struct IkLink
+    {
+      int link_bone;					// リンクボーンのインデックス
+      bool is_limit;					// 角度制限 0:OFF 1:ON
+      Float3 low;						// 下限角度x,y,z(ラジアン)
+      Float3 high;						// 上限角度x,y,z(ラジアン)
+    }* ik_link;							// IKリンクの先頭ポインタ [0]～[ik_link_count-1]まで
+
+    int __unknown49[10];
   };
 
   static_assert(sizeof(BoneCurrentData) == 624, "");
@@ -1092,7 +1146,7 @@ namespace mmp
     char comment_jp[256];
     char comment_en[292]; // もしかしたら別の領域に分かれてるかも
     wchar_t file_path[256];
-    BoneCurrentData* bone_current_data;
+    BoneCurrentData* bone_current_data;		// ボーン情報の配列 [0]～[bone_count-1]まで
     int __unknown20[10];
     char keyframe_editor_toplevel_rows;
     void* __unknown30[2];
@@ -1137,9 +1191,9 @@ namespace mmp
     }*configuration_keyframe;
 
     int __unknown40[600];
-    char render_order;
+    char render_order;						// モデル描画順 1～ モデル追従等のコンボボックスの並びはこれの昇順
     int morph_count;
-    int bone_count;
+    int bone_count;							// ボーンの総数 表示枠に表示されていないボーンも含む
     int ik_count;
     char __unknown45;
     char is_visible;
@@ -1201,7 +1255,9 @@ namespace mmp
     int key_alt;
     int __unknown30;
     void* __unknown_pointer;
-    int __unknown40[156];
+    int __unknown40[148];
+	bool is_camera_edit_mode;			// true:カメラ編集モード false:モデル編集モード
+	int __unknown41[7];
     Float3 rxyz;
     int __unknown49[1];
     float counter_f;
@@ -1250,8 +1306,8 @@ namespace mmp
     int __unknown104[29];
     float view_angle;						// 視野角(度数) 書き換えても反映されるわけではない
     int __unknown105[290];
-	float play_sec;							// 再生中の先頭からの秒数 *30 でフレーム数になる 停止中は値は変わらない
-	int __unknown106[1933];
+    float play_sec;							// 再生中の先頭からの秒数 *30 でフレーム数になる 停止中は値は変わらない
+    int __unknown106[1933];
     char is_camera_select;					// カメラモードのタイムラインで「カメラ」行が選択状態なら1
     char is_light_select;					// カメラモードのタイムラインで「照明」行が選択状態なら1
     char is_self_shadow_select;				// カメラモードのタイムラインで「セルフ影」行が選択状態なら1
@@ -1262,7 +1318,9 @@ namespace mmp
     int output_size_y;
     float length;
     unsigned char __unknown120[32];
-    wchar_t pmm_path[256];
+    wchar_t pmm_path[256];					// MikuMikuDance.exe のパス
+    int __unknown130[27];
+    bool is_english_mode;					// 英語モードかどうか true:英語 false:日本語
   };
 
 

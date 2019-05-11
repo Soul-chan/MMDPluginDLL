@@ -10,19 +10,15 @@
 #include "../MMDPlugin/mmd_plugin.h"
 using namespace mmp;
 
-#include "../Common/Def.h"
-#include "../Common/CUnknownChecker.h"
-#include "../Common/CInifile.h"
-#include "../Common/CKeyState.h"
+#include "../Common/Common.h"
 
 
 //////////////////////////////////////////////////////////////////////
-class DispPlayingFramePlugin : public MMDPluginDLL3
+class DispPlayingFramePlugin : public MMDPluginDLL3, public CMmdCtrls, public Singleton<DispPlayingFramePlugin>
 {
 private:
 	MMDMainData*									m_mmdDataP;
 	bool											m_bShowWindow;		// 初回の WM_SHOWWINDOW 判定用
-	HWND											m_lenEditH;			// MMDの「距離」のエディットボックス
 	HWND											m_myTextH;			// フレーム表示用に自作するテキスト
 	HFONT											m_myTextFontH;		// フレーム表示用テキストのフォント
 	HBRUSH											m_myTextBrushH;		// フレーム表示用に自作するテキストの背景用ブラシ
@@ -30,17 +26,12 @@ private:
 	int												m_now_frame;		// 現在のフレーム変化検知用コピー
 	float											m_play_sec;			// 再生中の先頭からの秒数変化検知用コピー
 
-	// 「距離」のボタンのコントロールID
-	static constexpr int LENGTH_BTN_CTRL_ID = 0x21F;
-	// 「距離」のエディットボックスのコントロールID
-	static constexpr int LENGTH_EDIT_CTRL_ID = 0x226;
 public:
 	const char* getPluginTitle() const override { return "DispPlayingFrame"; }
 
 	DispPlayingFramePlugin()
 		: m_mmdDataP(nullptr)
 		, m_bShowWindow(false)
-		, m_lenEditH(nullptr)
 		, m_myTextH(nullptr)
 		, m_myTextFontH(nullptr)
 		, m_is_playing(true)
@@ -163,11 +154,10 @@ private:
 	{
 		HINSTANCE hInstance = GetModuleHandle(NULL);
 		HWND hMmd = getHWND();
-
-		// 「距離」のエディットボックスのハンドルを取得する
-		m_lenEditH = GetDlgItem(hMmd, LENGTH_EDIT_CTRL_ID);
-
 		TCHAR *defaultTxtP = _T("000000 (00:00.00)");
+
+		// コントロールハンドルの初期化
+		InitCtrl();
 
 		// 「距離」のエディットボックスと同じフォントにしておく
 		LOGFONT lfont = { 0 };
@@ -243,5 +233,5 @@ MMDPluginDLL3* create3(IDirect3DDevice9*)
 		MessageBox(getHWND(), _T("MMDのバージョンが 9.31 ではありません。\nDispPlayingFrameは Ver.9.31 以外では正常に作動しません。"), _T("DispPlayingFrame"), MB_OK | MB_ICONERROR);
 		return nullptr;
 	}
-	return new DispPlayingFramePlugin();
+	return DispPlayingFramePlugin::GetInstance();
 }

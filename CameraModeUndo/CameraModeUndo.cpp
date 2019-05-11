@@ -10,10 +10,7 @@
 #include "../MMDPlugin/mmd_plugin.h"
 using namespace mmp;
 
-#include "../Common/Def.h"
-#include "../Common/CUnknownChecker.h"
-#include "../Common/CInifile.h"
-#include "../Common/CKeyState.h"
+#include "../Common/Common.h"
 
 
 //////////////////////////////////////////////////////////////////////
@@ -1038,7 +1035,7 @@ typedef KeyFrameUndoRedo<CameraModeCopy, CameraModeUndoRedo>			CameraModeKeyFram
 typedef KeyFrameUndoRedo<AccessoryModeCopy, AccessoryModeUndoRedo>		AccessoryModeKeyFrameUndoRedo;
 
 //////////////////////////////////////////////////////////////////////
-class CameraModeUndoPlugin : public MMDPluginDLL3
+class CameraModeUndoPlugin : public MMDPluginDLL3, public CMmdCtrls, public Singleton<CameraModeUndoPlugin>
 {
 private:
 	MMDMainData*									m_mmdDataP;
@@ -1055,13 +1052,6 @@ private:
 	CKeyState										m_testKey;			// テストのキー
 	int												m_undoBuffMB;		// アンドゥバッファサイズ(MB)
 
-	HWND											m_frameNoEditH;		// MMDの「フレーム番号」のエディットボックスのハンドル
-	HWND											m_hscrollH;			// MMDのタイムラインの水平スクロールバーのハンドル
-	HWND											m_curveComboH;		// MMDの「補間曲線操作」パネルのコンボボックスのハンドル
-	HWND											m_modelComboH;		// MMDの「モデル操作」パネルのコンボボックスのハンドル
-	HWND											m_accComboH;		// MMDの「アクセサリ操作」パネルのコンボボックスのハンドル
-	HWND											m_undoBtnH;			// MMDの「元に戻す」ボタン
-	HWND											m_redoBtnH;			// MMDの「やり直し」ボタン
 	HWND											m_myCamUndoBtnH;	// カメラ用に自作する「元に戻す」ボタン
 	HWND											m_myCamRedoBtnH;	// カメラ用に自作する「やり直し」ボタン
 	HWND											m_myAccUndoBtnH;	// アクセサリ用に自作する「元に戻す」ボタン
@@ -1073,31 +1063,6 @@ private:
 	bool											m_bModelDelete;		// モデルが削除された
 	bool											m_bAccAddDelete;	// アクセサリが追加/削除された
 	
-	// 「フレーム番号」のエディットボックスのコントロールID
-	static constexpr int FRAME_NO_EDIT_CTRL_ID = 0x1A1;
-	// タイムラインの水平スクロールバーのコントロールID
-	static constexpr int HSCROLL_CTRL_ID = 0x1AC;
-	// 「補間曲線操作」パネルのコンボボックスのコントロールID
-	static constexpr int CURVE_COMBO_CTRL_ID = 0x1B1;
-	// 「モデル操作」パネルのコンボボックスのコントロールID
-	static constexpr int MODEL_COMBO_CTRL_ID = 0x1B4;
-	// 「カメラ操作」パネルの「登録」ボタンのコントロールID
-	static constexpr int CAMERA_BTN_CTRL_ID = 0x1C4;
-	// 「照明操作」パネルの「登録」ボタンのコントロールID
-	static constexpr int LIGHT_BTN_CTRL_ID = 0x1D4;
-	// 「セルフ影操作」パネルの「登録」ボタンのコントロールID
-	static constexpr int SELF_SHADOW_BTN_CTRL_ID = 0x235;
-	// 「アクセサリ操作」パネルの「登録」ボタンのコントロールID
-	static constexpr int ACCESSORY_BTN_CTRL_ID = 0x1E7;
-	// タイムラインの「ペースト」ボタンのコントロールID
-	static constexpr int PASTE_BTN_CTRL_ID = 0x1A5;
-	// タイムラインの「削除」ボタンのコントロールID
-	static constexpr int DELETE_BTN_CTRL_ID = 0x1A7;
-	// 「アクセサリ操作」パネルのコンボボックスのコントロールID
-	static constexpr int ACCESSORY_COMBO_CTRL_ID = 0x1D7;
-	// 「元に戻す」ボタンと「やり直し」ボタンのコントロールID
-	static constexpr int UNDO_BTN_CTRL_ID = 0x190;
-	static constexpr int REDO_BTN_CTRL_ID = 0x191;
 public:
 	const char* getPluginTitle() const override { return "CameraModeUndo"; }
 
@@ -1105,11 +1070,6 @@ public:
 		: m_mmdDataP(nullptr)
 		, m_bShowWindow(false)
 		, m_cameraKeyFrameP(nullptr)
-		, m_curveComboH(nullptr)
-		, m_modelComboH(nullptr)
-		, m_accComboH(nullptr)
-		, m_undoBtnH(nullptr)
-		, m_redoBtnH(nullptr)
 		, m_myCamUndoBtnH(nullptr)
 		, m_myCamRedoBtnH(nullptr)
 		, m_myAccUndoBtnH(nullptr)
@@ -1410,19 +1370,8 @@ private:
 		HINSTANCE hInstance = GetModuleHandle(NULL);
 		HWND hMmd = getHWND();
 
-		// 「フレーム番号」のエディットボックスのハンドルを取得する
-		m_frameNoEditH = GetDlgItem(hMmd, FRAME_NO_EDIT_CTRL_ID);
-		// タイムラインの水平スクロールバーのハンドルを取得する
-		m_hscrollH = GetDlgItem(hMmd, HSCROLL_CTRL_ID);
-		// 「補間曲線操作」パネルのコンボボックスのハンドルを取得する
-		m_curveComboH = GetDlgItem(hMmd, CURVE_COMBO_CTRL_ID);
-		// 「モデル操作」パネルのコンボボックスのハンドルを取得する
-		m_modelComboH = GetDlgItem(hMmd, MODEL_COMBO_CTRL_ID);
-		// 「アクセサリ操作」パネルのコンボボックスのハンドルを取得する
-		m_accComboH = GetDlgItem(hMmd, ACCESSORY_COMBO_CTRL_ID);
-		// MMDの「元に戻す」ボタンと「やり直し」ボタンを取得しておく
-		m_undoBtnH = GetDlgItem(hMmd, UNDO_BTN_CTRL_ID);
-		m_redoBtnH = GetDlgItem(hMmd, REDO_BTN_CTRL_ID);
+		// コントロールハンドルの初期化
+		InitCtrl();
 
 		// ボタンを作る
 		m_myCamUndoBtnH = CreateWindow(L"button", L"<-", WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
@@ -1617,7 +1566,7 @@ private:
 	// 再描画タイマーをセットする
 	// マウス処理から再描画を呼ぶとマウスを動かした位置でマウスアップと判定されてしまう
 	// なのでタイマーをセットしてマウス処理が終わってから再描画される様にする
-	// だったけど、今はマウスを動かさない様にしたので _repaint() 呼んでも問題ないかも…
+	// だったけど、今はマウスを動かさない様にしたので Repaint() 呼んでも問題ないかも…
 	void _setRepaintTimer()
 	{
 		// メッセージをポストするやり方だと、何故かは知らないがMMD操作中にはWM_TIMERが送られてこない
@@ -1628,30 +1577,10 @@ private:
 			KillTimer(getHWND(), idEvent);
 
 			CameraModeUndoPlugin * thisP = (CameraModeUndoPlugin *)idEvent;
-			thisP->_repaint();
+			thisP->Repaint();
 		});
 	}
 
-	// タイムラインと補間曲線の再描画
-	void _repaint()
-	{
-		HWND hMmd = getHWND();
-
-		// カメラ等の再描画
-		// フレーム番号を入力して再描画させる
-		SendMessage(m_frameNoEditH, WM_KEYDOWN, VK_RETURN, 0);
-
-		// タイムラインの再描画
-		// スクロールバーに現在位置を設定することで再描画させる
-		SCROLLINFO info = { sizeof(SCROLLINFO), SIF_POS };
-		GetScrollInfo(m_hscrollH, SB_CTL, &info);
-		SendMessage(hMmd, WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, info.nPos), (LPARAM)m_hscrollH);
-
-		// 補間曲線の再描画
-		// 補間曲線のコンボボックスを同じ値で設定
-		ComboBox_SetCurSel(m_curveComboH, ComboBox_GetCurSel(m_curveComboH));
-		SendMessage(hMmd, WM_COMMAND, MAKEWPARAM(CURVE_COMBO_CTRL_ID, CBN_SELCHANGE), (LPARAM)m_curveComboH);
-	}
 };
 
 int version() { return 3; }
@@ -1663,5 +1592,5 @@ MMDPluginDLL3* create3(IDirect3DDevice9*)
 		MessageBox(getHWND(), _T("MMDのバージョンが 9.31 ではありません。\nCameraModeUndoは Ver.9.31 以外では正常に作動しません。"), _T("CameraModeUndo"), MB_OK | MB_ICONERROR);
 		return nullptr;
 	}
-	return new CameraModeUndoPlugin();
+	return CameraModeUndoPlugin::GetInstance();
 }

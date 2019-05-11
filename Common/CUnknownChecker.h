@@ -62,6 +62,7 @@ public:
 		ARY_CHECK(__unknown10, %d);
 		ARY_CHECK(__unknown20, %d);
 		ARY_CHECK(__unknown40, %d);
+		ARY_CHECK(__unknown41, %d);
 		ARY_CHECK(__unknown49, %d);
 		ARY_CHECK(__unknown50, %d);
 		ARY_CHECK(__unknown60, %d);
@@ -75,6 +76,7 @@ public:
 		ARY_CHECK(__unknown109, %d);
 		ARY_CHECK(__unknown110, %d);
 		ARY_CHECK(__unknown120, %d);
+		ARY_CHECK(__unknown130, %d);
 
 #define	VAL_CHECK(name, fmt)	\
 		if (copyP->name != mmd_data->name)	\
