@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include <windows.h>
+#include <windowsX.h>
 
 #pragma once
 

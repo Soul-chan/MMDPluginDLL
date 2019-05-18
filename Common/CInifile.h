@@ -3,6 +3,7 @@
 #include <list>
 #include <string>
 #include <functional>
+#include <shlwapi.h>
 
 #pragma once
 

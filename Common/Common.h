@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "../Common/Def.h"
 #include "../Common/Singleton.h"
+#include "../Common/CCtrlSubClass.h"
 #include "../Common/CMmdCtrls.h"
 #include "../Common/CUnknownChecker.h"
 #include "../Common/CInifile.h"

@@ -21,7 +21,6 @@ private:
 	bool											m_bShowWindow;		// 初回の WM_SHOWWINDOW 判定用
 	HWND											m_myTextH;			// フレーム表示用に自作するテキスト
 	HFONT											m_myTextFontH;		// フレーム表示用テキストのフォント
-	HBRUSH											m_myTextBrushH;		// フレーム表示用に自作するテキストの背景用ブラシ
 	int												m_is_playing;		// 再生中かどうか 0:停止中 1:再生中変化検知用コピー
 	int												m_now_frame;		// 現在のフレーム変化検知用コピー
 	float											m_play_sec;			// 再生中の先頭からの秒数変化検知用コピー
@@ -48,7 +47,7 @@ public:
 	void stop() override
 	{
 		// タイマーOFF
-		KillTimer(getHWND(), (UINT_PTR)this);
+		KillTimer(m_myTextH, (UINT_PTR)this);
 
 		// フォントをデフォルトに戻す
 		if (m_myTextH)
@@ -137,9 +136,8 @@ public:
 				HWND hCtrl = (HWND)param->lParam;
 				if (hCtrl == m_myTextH)
 				{
-					_dbgPrint("HIT!!!!");
-					SetBkMode(hDC, TRANSPARENT);		// 背景を塗りつぶし
-					SetTextColor(hDC, RGB(255, 0, 0));	// テキストの色
+					SetBkMode(hDC, TRANSPARENT);			// 背景を塗りつぶし
+					SetTextColor(hDC, RGB(255, 0, 0));		// テキストの色
 					SetBkColor(hDC, RGB(192, 192, 192));	// テキストが書かれている部分のテキストの背景の色
 				//	return{ true, (LRESULT)COLOR_WINDOW };	// テキストが書かれていない部分の背景の色
 				}
@@ -184,10 +182,7 @@ private:
 		SendMessage(m_myTextH, WM_SETFONT, (WPARAM)m_myTextFontH, TRUE);
 
 		// タイマー開始
-		// メッセージをポストするやり方だと、何故かは知らないがMMD操作中にはWM_TIMERが送られてこない
-		// (タイトルバーとかを操作すると遅れて届き始める)
-		// それじゃ役に立たないので、コールバックで処理する
-		SetTimer(getHWND(), (UINT_PTR)this, 10, [](HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
+		SetTimer(m_myTextH, (UINT_PTR)this, 10, [](HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 		{
 			DispPlayingFramePlugin * thisP = (DispPlayingFramePlugin *)idEvent;
 			thisP->_frameCheck(false);

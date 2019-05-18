@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{45d41acc-2c3c-43d2-bc10-02aa73ffc7c7}</ItemsProjectGuid>
+    <ItemsProjectName>Common</ItemsProjectName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)CCtrlSubClass.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)CInifile.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)CKeyState.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)CMenu.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)CMmdCtrls.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Common.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)CPostMsgHook.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)CUnknownChecker.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Def.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Singleton.h" />
+  </ItemGroup>
+</Project>
