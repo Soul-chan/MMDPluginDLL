@@ -24,6 +24,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SetCameraFollowBone", "SetC
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "Common\Common.vcxitems", "{45D41ACC-2C3C-43D2-BC10-02AA73FFC7C7}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SwapOutsideParent", "SwapOutsideParent\SwapOutsideParent.vcxproj", "{B650B635-B11B-4D9D-A2F6-17C00F6853D1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -44,6 +46,10 @@ Global
 		{794E8955-E6F0-4923-8621-01C0FDA25BCA}.Debug|x64.Build.0 = Debug|x64
 		{794E8955-E6F0-4923-8621-01C0FDA25BCA}.Release|x64.ActiveCfg = Release|x64
 		{794E8955-E6F0-4923-8621-01C0FDA25BCA}.Release|x64.Build.0 = Release|x64
+		{B650B635-B11B-4D9D-A2F6-17C00F6853D1}.Debug|x64.ActiveCfg = Debug|x64
+		{B650B635-B11B-4D9D-A2F6-17C00F6853D1}.Debug|x64.Build.0 = Debug|x64
+		{B650B635-B11B-4D9D-A2F6-17C00F6853D1}.Release|x64.ActiveCfg = Release|x64
+		{B650B635-B11B-4D9D-A2F6-17C00F6853D1}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

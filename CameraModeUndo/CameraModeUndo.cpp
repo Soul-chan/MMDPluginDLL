@@ -1125,7 +1125,7 @@ public:
 	void KeyBoardProc(WPARAM wParam, LPARAM lParam) override
 	{
 		_checkRemakePtr();
-		if (_isCameraMode())
+		if (IsCameraMode())
 		{
 			if ((lParam & 0x40000000) &&	// 直前にキーが押されていて
 				(lParam & 0x80000000))		// キーが離されているなら
@@ -1186,7 +1186,7 @@ public:
 	void MouseProc(WPARAM wParam, MOUSEHOOKSTRUCT* lParam) override
 	{
 		_checkRemakePtr();
-		if (_isCameraMode())
+		if (IsCameraMode())
 		{
 			// 左ボタンアップ時に検出
 			if (wParam == WM_LBUTTONUP)
@@ -1299,7 +1299,7 @@ public:
 			{
 				if (param->wParam == TRUE)
 				{
-					if (_isCameraMode())
+					if (IsCameraMode())
 					{
 						m_bUpdateBtnVisible = true;
 					}
@@ -1488,21 +1488,6 @@ private:
 		}
 	}
 
-	// 現在カメラモードかどうかコンボボックスの状態から判定する
-	// select_bone_type はモデルモードの未選択時でも「2:カメラモード」になっているので使えない
-	bool _isCameraMode()
-	{
-		if (m_modelComboH != nullptr)
-		{
-			// 0番目の「ｶﾒﾗ･照明･ｱｸｾｻﾘ」が選択されているか?
-			if (ComboBox_GetCurSel(m_modelComboH) == 0)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
 	// ボタンの状態を更新する
 	void _updateBtnState()
 	{
@@ -1551,7 +1536,7 @@ private:
 	// ボタンの表示状態を更新する
 	void _updateBtnVisible()
 	{
-		bool bCamMode = _isCameraMode();
+		bool bCamMode = IsCameraMode();
 
 		// MMDの「元に戻す」ボタンと「やり直し」ボタンはカメラモードでは非表示
 		ShowWindow(m_undoBtnH, !bCamMode);

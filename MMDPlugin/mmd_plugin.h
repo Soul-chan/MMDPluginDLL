@@ -22,6 +22,28 @@
 # pragma comment(lib,"MMDPlugin/MMDPlugin")
 #endif // MAKE_MMD_PLUGIN
 
+#if !defined _MATH_DEFINES_DEFINED
+    #define _MATH_DEFINES_DEFINED
+    // Definitions of useful mathematical constants
+    //
+    // Define _USE_MATH_DEFINES before including <math.h> to expose these macro
+    // definitions for common math constants.  These are placed under an #ifdef
+    // since these commonly-defined names are not part of the C or C++ standards
+    #define M_E        2.71828182845904523536   // e
+    #define M_LOG2E    1.44269504088896340736   // log2(e)
+    #define M_LOG10E   0.434294481903251827651  // log10(e)
+    #define M_LN2      0.693147180559945309417  // ln(2)
+    #define M_LN10     2.30258509299404568402   // ln(10)
+    #define M_PI       3.14159265358979323846   // pi
+    #define M_PI_2     1.57079632679489661923   // pi/2
+    #define M_PI_4     0.785398163397448309616  // pi/4
+    #define M_1_PI     0.318309886183790671538  // 1/pi
+    #define M_2_PI     0.636619772367581343076  // 2/pi
+    #define M_2_SQRTPI 1.12837916709551257390   // 2/sqrt(pi)
+    #define M_SQRT2    1.41421356237309504880   // sqrt(2)
+    #define M_SQRT1_2  0.707106781186547524401  // 1/sqrt(2)
+#endif
+
 extern "C"
 {
   MMD_DLL_FUNC_API int getMMDPluginVersion();
@@ -936,9 +958,121 @@ namespace mmp
     return a - eps <= b && b <= a + eps;
   }
 
+  struct Float4
+  {
+    float x, y, z, w;
+
+	Float4() {}
+
+	Float4(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) {}
+
+    bool operator==(const Float4& o) const
+    {
+      return compare(x, o.x) && compare(y, o.y) && compare(z, o.z) && compare(w, o.w);
+    }
+
+    bool operator!=(const Float4& o) const
+    {
+      return !(*this == o);
+    }
+
+	Float4& operator += (const Float4& o)
+	{
+		x += o.x;	y += o.y;	z += o.z;	w += o.w;
+		return *this;
+	}
+
+	Float4& operator -= (const Float4& o)
+	{
+		x -= o.x;	y -= o.y;	z -= o.z;	w -= o.w;
+		return *this;
+	}
+
+	Float4& operator *= (float f)
+	{
+		x *= f;	y *= f;	z *= f;	w *= f;
+		return *this;
+	}
+
+	Float4& operator /= (float f)
+	{
+		x /= f;	y /= f;	z /= f;	w /= f;
+		return *this;
+	}
+
+	Float4 operator + (const Float4& o) const
+	{
+		Float4 ret;
+		ret.x = x + o.x;	ret.y = y + o.y;	ret.z = z + o.z;	ret.w = w + o.w;
+		return ret;
+	}
+
+	Float4 operator - (const Float4& o) const
+	{
+		Float4 ret;
+		ret.x = x - o.x;	ret.y = y - o.y;	ret.z = z - o.z;	ret.w = w - o.w;
+		return ret;
+	}
+
+	Float4 operator * (float f) const
+	{
+		Float4 ret;
+		ret.x = x * f;	ret.y = y * f;	ret.z = z * f;	ret.w = w * f;
+		return ret;
+	}
+
+	Float4 operator / (float f) const
+	{
+		Float4 ret;
+		ret.x = x / f;	ret.y = y / f;	ret.z = z / f;	ret.w = w / f;
+		return ret;
+	}
+
+	// ベクトルの長さ
+	float magnitude() const
+	{
+		return std::sqrtf(x*x + y*y + z*z + w*w);
+	}
+
+	// ベクトルの長さの2乗
+	float sqrMagnitude() const
+	{
+		return (x*x + y*y + z*z + w*w);
+	}
+
+	// 内積
+	float dot(const Float4& o) const
+	{
+		return (x*o.x + y*o.y + z*o.z + w*o.w);
+	}
+
+	// 自身を正規化
+	Float4& normalize()
+	{
+		*this /= magnitude();
+		return *this;
+	}
+
+	// 正規化
+	Float4 normalized() const
+	{
+		return (*this / magnitude());
+	}
+
+	// 長さが0かどうか
+	bool isZero() const
+	{
+		return compare(x, 0) && compare(y, 0) && compare(z, 0) && compare(w, 0);
+	}
+  };
+
   struct Float3
   {
     float x, y, z;
+
+	Float3() {}
+
+	Float3(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {}
 
     bool operator==(const Float3& o) const
     {
@@ -949,7 +1083,210 @@ namespace mmp
     {
       return !(*this == o);
     }
+
+	Float3& operator += (const Float3& o)
+	{
+		x += o.x;	y += o.y;	z += o.z;
+		return *this;
+	}
+
+	Float3& operator -= (const Float3& o)
+	{
+		x -= o.x;	y -= o.y;	z -= o.z;
+		return *this;
+	}
+
+	Float3& operator *= (float f)
+	{
+		x *= f;	y *= f;	z *= f;
+		return *this;
+	}
+
+	Float3& operator /= (float f)
+	{
+		x /= f;	y /= f;	z /= f;
+		return *this;
+	}
+
+	Float3 operator + (const Float3& o) const
+	{
+		Float3 ret;
+		ret.x = x + o.x;	ret.y = y + o.y;	ret.z = z + o.z;
+		return ret;
+	}
+
+	Float3 operator - (const Float3& o) const
+	{
+		Float3 ret;
+		ret.x = x - o.x;	ret.y = y - o.y;	ret.z = z - o.z;
+		return ret;
+	}
+
+	Float3 operator * (float f) const
+	{
+		Float3 ret;
+		ret.x = x * f;	ret.y = y * f;	ret.z = z * f;
+		return ret;
+	}
+
+	Float3 operator / (float f) const
+	{
+		Float3 ret;
+		ret.x = x / f;	ret.y = y / f;	ret.z = z / f;
+		return ret;
+	}
+
+	// ベクトルの長さ
+	float magnitude() const
+	{
+		return std::sqrtf(x*x + y*y + z*z);
+	}
+
+	// ベクトルの長さの2乗
+	float sqrMagnitude() const
+	{
+		return (x*x + y*y + z*z);
+	}
+
+	// 内積
+	float dot(const Float3& o) const
+	{
+		return (x*o.x + y*o.y + z*o.z);
+	}
+
+	// 外積
+	Float3 cross(const Float3& o) const
+	{
+		Float3 ret;
+		ret.x = y*o.z - z*o.y;
+		ret.y = z*o.x - x*o.z;
+		ret.z = x*o.y - y*o.x;
+		return ret;
+	}
+
+	// 自身を正規化
+	Float3& normalize()
+	{
+		*this /= magnitude();
+		return *this;
+	}
+
+	// 正規化
+	Float3 normalized() const
+	{
+		return (*this / magnitude());
+	}
+
+	// 長さが0かどうか
+	bool isZero() const
+	{
+		return compare(x, 0) && compare(y, 0) && compare(z, 0);
+	}
+
+	// 行列を掛ける
+	Float3 transform(const D3DMATRIX &m) const
+	{
+		Float3 ret;
+		ret.x = x * m._11 + y * m._21 + z * m._31 + m._41;
+		ret.y = x * m._12 + y * m._22 + z * m._32 + m._42;
+		ret.z = x * m._13 + y * m._23 + z * m._33 + m._43;
+		return ret;
+	}
+
+	// 行列を掛ける
+	Float4 transform4(const D3DMATRIX &m) const
+	{
+		Float4 ret;
+		ret.x = x * m._11 + y * m._21 + z * m._31 + m._41;
+		ret.y = x * m._12 + y * m._22 + z * m._32 + m._42;
+		ret.z = x * m._13 + y * m._23 + z * m._33 + m._43;
+		ret.w = x * m._14 + y * m._24 + z * m._34 + m._44;
+		return ret;
+	}
   };
+  
+  // ベクトルに行列を掛ける
+  Float3* Float3Transform(Float3 *pOut, const Float3 *pV, const D3DMATRIX *pM)
+  {
+	*pOut = pV->transform(*pM);
+	return pOut;
+  }
+  // ベクトルに行列を掛ける
+  Float4* Float3Transform(Float4 *pOut, const Float3 *pV, const D3DMATRIX *pM)
+  {
+	*pOut = pV->transform4(*pM);
+	return pOut;
+  }
+
+  // ラジアンを角度に変換
+  float Rad2Deg(float rad)
+  {
+	  return rad * 180.0f / (float)M_PI;
+  }
+
+  // 角度をラジアンに変換
+  float Deg2Rad(float deg)
+  {
+	  return deg * (float)M_PI / 180.0f;
+  }
+
+  // なす角を求める
+  float SubtendedDeg(const Float3 *pV1, const Float3 *pV2)
+  {
+	  // 正規化して
+	  auto v1 = pV1->normalized();
+	  auto v2 = pV2->normalized();
+
+	  // 内積
+	  auto cos = v1.dot(v2);
+
+	  // 角度にして返す
+	  return Rad2Deg(acos(cos));
+  }
+  // なす角を求める
+  float SubtendedDeg(const Float4 *pV1, const Float4 *pV2)
+  {
+	  // 正規化して
+	  auto v1 = pV1->normalized();
+	  auto v2 = pV2->normalized();
+
+	  // 内積
+	  auto cos = v1.dot(v2);
+
+	  // 角度にして返す
+	  return Rad2Deg(acos(cos));
+  }
+
+  // 回転行列からオイラー角(ラジアン)へ変換する
+  Float3* Matrix2Rad(Float3 *pV, const D3DMATRIX &m)
+  {
+	  // X軸(1, 0, 0) を回転した時の成分 (_11, _12, _13)
+	  // Y軸(0, 1, 0) を回転した時の成分 (_21, _22, _23)
+	  // Z軸(0, 0, 1) を回転した時の成分 (_31, _32, _33)
+	  pV->x = -asin(m._32);			// Z軸のY成分からX回転を求める
+	  pV->y = -atan2(m._31, m._33);	// Z軸のXZ成分からY回転を求める
+	  pV->z = -atan2(m._12, m._22);	// X軸とY軸のY成分からZ回転を求める
+
+										// Xが90±0.00005度の場合
+	  if (fabs(cos(pV->x)) < 1.0e-6f)
+	  {
+		  pV->z = (m._12 > 0.0f) ? -(float)M_PI : +(float)M_PI;	// X軸のY成分でZの方向を決める
+		  pV->y = (m._31 > 0.0f) ? -(float)M_PI : +(float)M_PI;	// Z軸のX成分でYの方向を決める
+	  }
+
+	  return pV;
+  }
+
+  // 回転行列からオイラー角(角度)へ変換する
+  Float3* Matrix2Deg(Float3 *pV, const D3DMATRIX &m)
+  {
+	  Matrix2Rad(pV, m);
+
+	  pV->x = Rad2Deg(pV->x);
+	  pV->y = Rad2Deg(pV->y);
+	  pV->z = Rad2Deg(pV->z);
+	  return pV;
+  }
 
   // 84バイト
   struct CameraKeyFrameData
@@ -985,14 +1322,41 @@ namespace mmp
       return !(*this == o);
     }
 
-	int GetR() { return (int)(r * 256); }
-	int GetG() { return (int)(g * 256); }
-	int GetB() { return (int)(b * 256); }
+    int GetR() { return (int)(r * 256); }
+    int GetG() { return (int)(g * 256); }
+    int GetB() { return (int)(b * 256); }
 
-	void SetR(int val) { r = val / 256.0f; }
-	void SetG(int val) { g = val / 256.0f; }
-	void SetB(int val) { b = val / 256.0f; }
-	void SetRGB(int rv, int gv, int bv) { SetR(rv); SetG(gv); SetB(bv); }
+    void SetR(int val) { r = val / 256.0f; }
+    void SetG(int val) { g = val / 256.0f; }
+    void SetB(int val) { b = val / 256.0f; }
+    void SetRGB(int rv, int gv, int bv) { SetR(rv); SetG(gv); SetB(bv); }
+  };
+  
+  struct Color4
+  {
+    float r, g, b, a;
+
+    bool operator==(const Color4& o) const
+    {
+      return compare(r, o.r) && compare(g, o.g) && compare(b, o.b) && compare(a, o.a);
+    }
+
+    bool operator!=(const Color4& o) const
+    {
+      return !(*this == o);
+    }
+
+    int GetR() { return (int)(r * 256); }
+    int GetG() { return (int)(g * 256); }
+    int GetB() { return (int)(b * 256); }
+    int GetA() { return (int)(a * 256); }
+
+    void SetR(int val) { r = val / 256.0f; }
+    void SetG(int val) { g = val / 256.0f; }
+    void SetB(int val) { b = val / 256.0f; }
+    void SetA(int val) { a = val / 256.0f; }
+    void SetRGB(int rv, int gv, int bv) { SetR(rv); SetG(gv); SetB(bv); }
+    void SetRGBA(int rv, int gv, int bv, int av) { SetR(rv); SetG(gv); SetB(bv); SetA(av); }
   };
 
   // 40バイト
@@ -1069,17 +1433,19 @@ namespace mmp
 
   struct BoneCurrentData
   {
+	// 行列や位置、クォータニオンはフレームを動かした後再描画を待たないと更新されない
+	// RedrawWindow() もしくは WM_PAINT が処理されるのを待つ
     char name_jp[20];
     char name_en[20];
     wchar_t *wname_jp;					// ポインタなので構造体の先頭がwchar_tの名前と言うだけかもしれない こっちは20文字以上でも最後まで入っている 1300文字くらいまでは確認
     wchar_t *wname_en;
     int parent_bone;					// 親ボーンのインデックス
-    D3DMATRIX __unknown_mat[4];
-    float init_x, init_y, init_z;
-    float x, y, z;
-    float __unknown10_rotation_q[4];
-    float __unknown20_rotation_q[4];
-    float x2, y2, z2;
+    D3DMATRIX mat[4];					// 行列 [0]は初期値XYZを現在のワールド位置に変換する行列(ローカル位置やローカル回転も含んだ行列) [0]と[3]は同じ? [1]は単位行列?
+    float init_x, init_y, init_z;		// 初期値XYZ(ボーンの「位置」で設定している値)
+    float x, y, z;						// 現在のフレームでのローカル位置
+    float local_rotation_q[4];			// 現在のフレームでのローカル回転
+    float ik_rotation_q[4];				// 現在のフレームでのIK込みでのローカル回転
+    float x2, y2, z2;					// x, y, z と同じ
     float __unknown30_rotation_q[4];
     int __unknown30[17];
     int to_bone;						// 接続先ボーンのインデックス なしの場合は-1 ConnectToBone が立っている時のみ有効 ボーン総数より大きい値を入力されている場合は不定
@@ -1123,7 +1489,7 @@ namespace mmp
     float ik_unit_angle;				// IKループ計算時の1回あたりの単位角度(ラジアン)
     int ik_link_count;					// IKリンク数 : 後続のik_link[]要素数
     int __unknown48;
-	
+
     // IKリンク
     struct IkLink
     {
@@ -1133,10 +1499,92 @@ namespace mmp
       Float3 high;						// 上限角度x,y,z(ラジアン)
     }* ik_link;							// IKリンクの先頭ポインタ [0]～[ik_link_count-1]まで
 
-    int __unknown49[10];
+    int __unknown49[8];
+	int parentable_bone_index;			// 外部親設定の「対象ボーン」でのインデックス 「対象ボーン」でないボーンは-1が入っている 「対象ボーン」の0番は「ルート」なのでここには 1～parentable_bone_count-1までの値が入っている
+	int __unknown50;
   };
 
   static_assert(sizeof(BoneCurrentData) == 624, "");
+
+  // 頂点モーフ
+  struct MorphDataVertex
+  {
+    int index;							// モーフ対象の頂点インデックス
+    Float3 v;							// 座標オフセット量(x,y,z)
+  };
+
+  // UVモーフ
+  struct MorphDataUv
+  {
+    int index;							// モーフ対象の頂点インデックス
+    Float4 uv;							// UVオフセット量(x,y,z,w) ※通常UVはz,wが不要項目になるがモーフとしてのデータ値は記録しておく
+  };
+
+  // ボーンモーフ
+  struct MorphDataBone
+  {
+    int index;							// モーフ対象のボーンインデックス
+    Float3 m;							// 移動量(x,y,z)
+    Float4 q;							// 回転量-クォータニオン(x,y,z,w)
+  };
+
+  // 材質モーフ
+  struct MorphDataMaterial
+  {
+    int index;							// モーフ対象の材質インデックス -1:全材質対象
+    int type;							// オフセット演算形式 0:乗算 1:加算
+    Color4 diffuse;						// 拡散色/非透過度 (R,G,B,A)
+    Color4 specular;					// 反射色 (R,G,B) Aは未使用
+    float specular_intensity;			// 反射強度
+    Color4 ambient;						// 環境色 (R,G,B)
+    Color4 edge;						// エッジ色 (R,G,B,A)
+    float edge_size;					// エッジサイズ
+    Color4 tex;							// テクスチャ係数 (R,G,B,A)
+    Color4 sphere;						// スフィアテクスチャ係数 (R,G,B,A)
+    Color4 toon;						// Toonテクスチャ係数 (R,G,B,A)
+  };
+
+  // グループモーフ
+  struct MorphDataGroup
+  {
+    int index;							// モーフ対象のモーフインデックス グループモーフのグループ化は非対応
+    float rate;							// モーフ率 : グループモーフのモーフ値 * モーフ率 = 対象モーフのモーフ値
+  };
+
+  // モーフ
+  struct MorphCurrentData
+  {
+    char name_jp[20];
+    char name_en[20];
+    wchar_t *wname_jp;					// ポインタなので構造体の先頭がwchar_tの名前と言うだけかもしれない こっちは20文字以上でも最後まで入っている 1300文字くらいまでは確認
+    wchar_t *wname_en;
+    int __unknown0;
+    int data_size_vertex;				// 頂点モーフのデータ数
+    int data_size_uv;					// UVモーフのデータ数 
+    int data_size_uv1;					// 追加UV1モーフのデータ数 
+    int data_size_uv2;					// 追加UV2モーフのデータ数 
+    int data_size_uv3;					// 追加UV3モーフのデータ数 
+    int data_size_uv4;					// 追加UV4モーフのデータ数 
+    int data_size_bone;					// ボーンモーフのデータ数
+    int data_size_group;				// グループモーフのデータ数
+    int data_size_material;				// 材質モーフのデータ数
+    char panel;							// 操作パネル 1:眉(左下) 2:目(左上) 3:口(右上) 4:その他(右下)  | 0:システム予約
+    char type;							// モーフ種類 - 0:グループ, 1:頂点, 2:ボーン, 3:UV, 4:追加UV1, 5:追加UV2, 6:追加UV3, 7:追加UV4, 8:材質
+    char __unknown10[6];
+    MorphDataVertex *data_vertex;		// 頂点モーフデータ [data_size_vertex] 個の配列
+    MorphDataBone *data_bone;			// ボーンモーフデータ [data_size_bone] 個の配列
+    MorphDataGroup *data_group;			// グループモーフデータ [data_size_group] 個の配列
+    MorphDataUv *data_uv;				// UVモーフデータ [data_size_uv] 個の配列
+    MorphDataUv *data_uv1;				// 追加UV1モーフデータ [data_size_uv1] 個の配列
+    MorphDataUv *data_uv2;				// 追加UV2モーフデータ [data_size_uv2] 個の配列
+    MorphDataUv *data_uv3;				// 追加UV3モーフデータ [data_size_uv3] 個の配列
+    MorphDataUv *data_uv4;				// 追加UV4モーフデータ [data_size_uv4] 個の配列
+    MorphDataMaterial *data_material;	// 材質モーフデータ [data_size_material] 個の配列
+    void *data__unknown_0;
+    void *data__unknown_1;
+  };
+
+  static_assert(sizeof(MorphCurrentData) == 192, "");
 
   struct MMDModelData
   {
@@ -1147,64 +1595,79 @@ namespace mmp
     char comment_en[292]; // もしかしたら別の領域に分かれてるかも
     wchar_t file_path[256];
     BoneCurrentData* bone_current_data;		// ボーン情報の配列 [0]～[bone_count-1]まで
-    int __unknown20[10];
+    int __unknown20[2];
+    MorphCurrentData* morph_current_data;	// 表情モーフ情報の配列 [0]～[morph_count-1]まで
+    int __unknown25[6];
     char keyframe_editor_toplevel_rows;
     void* __unknown30[2];
 
     struct BoneKeyFrame
     {
-      int frame_number;
-      int pre_index;
-      int next_index;
+      int frame_no;							// フレーム番号0～
+      int pre_index;						// 前のキーフレーム 最初のフレームも0
+      int next_index;						// 次のキーフレームがあるときに0以外になる
       char interpolation_curve_x1[4];
       char interpolation_curve_y1[4];
       char interpolation_curve_x2[4];
       char interpolation_curve_y2[4];
-      float x, y, z;
+      float x, y, z;						// X Y Z
       float rotation_q[4];
-      int __unknown;
-    }*bone_keyframe;
+      int is_selected;						// 1で選択している。0で選択していない
+    };
+    // [0]～[bone_count-1]までが各ボーンの0フレームのキーフレーム そこからリンクドリストでボーンのフレームが設定されている
+    // 空きを探す場合は[bone_count]からフレーム番号(frame_no)が0の要素を探す
+    BoneKeyFrame(&bone_keyframe)[600000];
 
     struct MorphKeyFrame
     {
-      int frame_number;
-      int pre_index;
-      int next_index;
-      float value;
-      char is_selected;
-    }*morph_keyframe;
+      int frame_no;							// フレーム番号0～
+      int pre_index;						// 前のキーフレーム 最初のフレームも0(だが非表示モーフの最初のフレームに変な値が入っていた事も…)
+      int next_index;						// 次のキーフレームがあるときに0以外になる
+      float value;							// モーフ値
+      char is_selected;						// 1で選択している。0で選択していない
+    };
+	// [0]～[morph_count-1]までが各モーフの0フレームのキーフレーム そこからリンクドリストでモーフのフレームが設定されている
+    // 空きを探す場合は[morph_count]からフレーム番号(frame_no)が0の要素を探す
+	// 表示枠に追加されていないモーフもこのテーブルは存在する
+    MorphKeyFrame(&morph_keyframe)[20000];
 
+	// 表示・IK・外観 のキーフレーム
     struct ConfigurationKeyFrame
     {
-      int frame_number;
-      int pre_index;
-      int next_index;
-      char is_visible;
-      char* is_ik_enabled;
-      int __unknown[2];
+      int frame_no;							// フレーム番号0～
+      int pre_index;						// 前のキーフレーム 最初のフレームも0
+      int next_index;						// 次のキーフレームがあるときに0以外になる
+      char is_visible;						// 「表示」のON/OFF 0:非表示 1:表示
+      char* is_ik_enabled;					// IKが有効かどうか 0:OFF 1:ON [0]～[ik_count-1]まで
+	  int is_selected;						// 1で選択している。0で選択していない
+      int __unknown;
 
+	  // 外部親設定の対象ボーン [0]～[parentable_bone_count-1]
+	  // [0]は「ルート」
+	  // bone_current_data->parentable_bone_index がこの配列の要素番号になる
       struct RelationSetting
       {
-        int parent_model_index;
-        int parent_bone_index;
+        int parent_model_index;				// 外部親モデル -1:なし -2:地面 0～:モデルのインデックス
+        int parent_bone_index;				// 外部親ボーン
       }*relation_setting;
-    }*configuration_keyframe;
+	};
+	ConfigurationKeyFrame(&configuration_keyframe)[1000];
 
     int __unknown40[600];
     char render_order;						// モデル描画順 1～ モデル追従等のコンボボックスの並びはこれの昇順
-    int morph_count;
+    int morph_count;						// モーフの総数
     int bone_count;							// ボーンの総数 表示枠に表示されていないボーンも含む
-    int ik_count;
+    int ik_count;							// IKの個数
     char __unknown45;
     char is_visible;
     int selected_bone;
     int __unknown50[4];
-    int selected_morph_indices[4];
+    int selected_morph_indices[4];			// 「表情操作」で選択されているモーフの番号(番号はPmxEditorのモーフタブでの番号と同じ) [0]まゆ [1]目 [2]リップ [3]その他
     int __unknown59[257];
     int vscroll;
     int last_frame_number;
     int __unknown60[150475];
-    int parentable_bone_count;
+    int parentable_bone_count;				// 外部親設定の「対象ボーン」数 configuration_keyframe->relation_setting の要素数
   };
 
   // ReSharper disable CppZeroConstantCanBeReplacedWithNullptr
@@ -1225,10 +1688,10 @@ namespace mmp
     int key_down;
     int key_left;
     int key_right;
-    int key_shift; // keyは0から3までの数値を取る。押している間は3になる。
+    int key_shift;							// keyは0から3までの数値を取る。押している間は3になる。
     int key_space;
     int key_f9;
-    int key_x_or_f11; // f11の場合は2になる
+    int key_x_or_f11;						// f11の場合は2になる
     int key_z;
     int key_c;
     int key_v;
@@ -1256,24 +1719,24 @@ namespace mmp
     int __unknown30;
     void* __unknown_pointer;
     int __unknown40[148];
-	bool is_camera_edit_mode;			// true:カメラ編集モード false:モデル編集モード
-	int __unknown41[7];
+    bool is_camera_edit_mode;				// true:カメラ編集モード false:モデル編集モード
+    int __unknown41[7];
     Float3 rxyz;
     int __unknown49[1];
     float counter_f;
     int counter;
     int __unknown50[2];
-	int is_playing;						// 再生中かどうか 0:停止中 1:再生中
+    int is_playing;							// 再生中かどうか 0:停止中 1:再生中
     Float3 xyz;
     int __unknown60[22];
     CameraKeyFrameData(&camera_key_frame)[10000];
-    LightKeyFrameData(&light_key_frame)[10000]; // 照明のキーフレームポインタ 1要素は40バイト
-    SelfShadowKeyFrameData(&self_shadow_key_frame)[10000]; // セルフ影のキーフレームポインタ 1要素は24バイト
-    GravityKeyFrameData(&gravity_key_frame)[10000]; // 重力のキーフレームポインタ 1要素は36バイト
+    LightKeyFrameData(&light_key_frame)[10000];						// 照明のキーフレームポインタ 1要素は40バイト
+    SelfShadowKeyFrameData(&self_shadow_key_frame)[10000];			// セルフ影のキーフレームポインタ 1要素は24バイト
+    GravityKeyFrameData(&gravity_key_frame)[10000];					// 重力のキーフレームポインタ 1要素は36バイト
     typedef AccessoryKeyFrameData AccessoryKeyFrameDataAry[10000];
-    AccessoryKeyFrameDataAry* accessory_key_frames[255]; // アクセサリのキーフレームポインタの配列
-    MMDModelData* model_data[255]; // 起動時nullモデルを読み込むと順番にポインタが入る
-    int select_model;
+    AccessoryKeyFrameDataAry* accessory_key_frames[255];			// アクセサリのキーフレームポインタの配列
+    MMDModelData* model_data[255];			// 起動時nullモデルを読み込むと順番にポインタが入る モデルを削除するとその要素はnullになり、別のモデルを読み込むとそこに挿入される 「モデル操作」の並びとこの配列は必ずしも一致しない
+    int select_model;						// 現在「モデル操作」で選択されているmodel_data[]の要素番号 カメラ編集に変えた場合も最後に選択されていた番号が入っている モデルを削除した場合も自動でカメラ編集になるが、消されたモデルの要素番号のまま
 
     enum class SelectBoneType : int
     {
@@ -1361,6 +1824,14 @@ namespace mmp
   inline bool MMDVersionOk()
   {
     return getMMDVersion() == 9.31;
+  }
+
+  // モデルを現在のフレームで再表示する関数(?)を呼び出す
+  inline void redrawModel()
+  {
+    auto base = (BYTE*)GetModuleHandleW(nullptr);
+    auto func = (void(*)())(base + 0x225B0);
+	func();
   }
 }
 

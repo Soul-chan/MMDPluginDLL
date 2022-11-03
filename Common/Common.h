@@ -8,3 +8,4 @@
 #include "../Common/CKeyState.h"
 #include "../Common/CPostMsgHook.h"
 #include "../Common/CMenu.h"
+#include "../Common/CKeyFrameUtil.h"

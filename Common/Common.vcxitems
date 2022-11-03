@@ -17,6 +17,7 @@
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)CCtrlSubClass.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)CInifile.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)CKeyFrameUtil.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)CKeyState.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)CMenu.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)CMmdCtrls.h" />

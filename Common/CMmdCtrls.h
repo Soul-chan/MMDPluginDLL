@@ -75,6 +75,34 @@ public:
 		SendMessage(hMmd, WM_COMMAND, MAKEWPARAM(CURVE_COMBO_CTRL_ID, CBN_SELCHANGE), (LPARAM)m_curveComboH);
 	}
 
+	// タイムラインと補間曲線の再描画
+	void Repaint2()
+	{
+		HWND hMmd = getHWND();
+
+		// カメラ等の再描画
+		// フレーム番号を入力して再描画させる
+		SendMessage(m_frameNoEditH, WM_KEYDOWN, VK_RETURN, 0);
+
+		// これで良さそう?
+		UpdateWindow(hMmd);
+	}
+
+	// 現在カメラモードかどうかコンボボックスの状態から判定する
+	// select_bone_type はモデルモードの未選択時でも「2:カメラモード」になっているので使えない
+	bool IsCameraMode()
+	{
+		if (m_modelComboH != nullptr)
+		{
+			// 0番目の「ｶﾒﾗ･照明･ｱｸｾｻﾘ」が選択されているか?
+			if (ComboBox_GetCurSel(m_modelComboH) == 0)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	// 「フレーム番号」のエディットボックスのコントロールID
 	static constexpr int FRAME_NO_EDIT_CTRL_ID = 0x1A1;
 	// タイムラインの水平スクロールバーのコントロールID
@@ -83,6 +111,8 @@ public:
 	static constexpr int CURVE_COMBO_CTRL_ID = 0x1B1;
 	// 「モデル操作」パネルのコンボボックスのコントロールID
 	static constexpr int MODEL_COMBO_CTRL_ID = 0x1B4;
+	// 「モデル操作」パネルの「外」ボタンのコントロールID
+	static constexpr int MODEL_PARENT_BTN_CTRL_ID = 0x1BA;
 	// 「カメラ操作」パネルの「登録」ボタンのコントロールID
 	static constexpr int CAMERA_BTN_CTRL_ID = 0x1C4;
 	// 「照明操作」パネルの「登録」ボタンのコントロールID
@@ -104,5 +134,7 @@ public:
 	static constexpr int LENGTH_BTN_CTRL_ID = 0x21F;
 	// 「距離」のエディットボックスのコントロールID
 	static constexpr int LENGTH_EDIT_CTRL_ID = 0x226;
+	// 「カメラ操作」パネルのボーン追従コンボボックスのコントロールID
+	static constexpr int CAMERA_FOLLOW_BONE_COMBO_CTRL_ID = 0x1C1;
 };
 

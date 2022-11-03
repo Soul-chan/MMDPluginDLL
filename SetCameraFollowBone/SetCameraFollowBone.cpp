@@ -19,7 +19,7 @@ extern HMODULE g_module;
 #define ComboBox_AddStringA(hwndCtl, lpsz)			((int)(DWORD)::SendMessageA((hwndCtl), CB_ADDSTRING, 0L, (LPARAM)(LPCTSTR)(lpsz)))
 #define ComboBox_SetDroppedWidth(hwndCtl, len)		((int)(DWORD)::SendMessage((hwndCtl), CB_SETDROPPEDWIDTH, (WPARAM)(len), 0L))
 //////////////////////////////////////////////////////////////////////
-class SetCameraFollowBonePlugin : public MMDPluginDLL3, public Singleton<SetCameraFollowBonePlugin>, public CPostMsgHook
+class SetCameraFollowBonePlugin : public MMDPluginDLL3, public CMmdCtrls, public Singleton<SetCameraFollowBonePlugin>, public CPostMsgHook
 {
 private:
 	MMDMainData*									m_mmdDataP;
@@ -223,6 +223,7 @@ public:
 										{
 											// 「表示」か「IK」がONのボーンが対象
 											// IKはLinkのボーンも対象になる
+											// フラグがなしのボーンも対象になる
 											auto &boneR = modelP->bone_current_data[bIdx];
 											if (boneR.flg & BoneCurrentData::BoneFlag::IK)
 											{
@@ -238,6 +239,10 @@ public:
 												}
 											}
 											else if (boneR.flg & BoneCurrentData::BoneFlag::Visible)
+											{
+												_addIfNotExist(m_boneIdx, bIdx);
+											}
+											else if (boneR.flg == 0)
 											{
 												_addIfNotExist(m_boneIdx, bIdx);
 											}
@@ -307,6 +312,8 @@ public:
 						if (targetModel >= -1 && targetBone >= 0)
 						{
 							_setFollowBone(targetModel, targetBone);
+							// 再描画
+							Repaint2();
 						}
 					}
 						/// break; スルーして下へ
@@ -331,6 +338,9 @@ private:
 	{
 		HINSTANCE hInstance = GetModuleHandle(NULL);
 		HWND hMmd = getHWND();
+
+		// コントロールハンドルの初期化
+		InitCtrl();
 	}
 
 	// 選択中のカメラフレームにモデル追従をセットする
