@@ -6,7 +6,7 @@
 #include <d3d9.h>
 #include <memory>
 #include <string>
-#include <experimental/filesystem>
+#include <filesystem>
 
 ///#define MMDPLUGIN_D3DX9_HOOK
 #ifdef MMDPLUGIN_D3DX9_HOOK
@@ -919,7 +919,7 @@ namespace mmp
         reset();
       }
 
-      using Result = std::result_of_t<Func(Args ...)>;
+      using Result = std::invoke_result_t<Func(Args ...)>;
 
       bool hook(const char* module_name, const char* func_name, Func new_func)
       {
@@ -1839,7 +1839,7 @@ namespace mmp
 {
   MMD_PLUGIN_API MMDPluginDLL3* getDLL3Object(const char* dll_title);
 
-  namespace filesystem = std::experimental::filesystem;
+  namespace filesystem = std::filesystem;
 
   inline filesystem::path getDLLPath(HMODULE module)
   {

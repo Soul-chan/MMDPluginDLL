@@ -2,9 +2,9 @@
 //
 
 #include "stdafx.h"
-#include <atltime.h>
 #include <deque>
 #include <map>
+#include <Tchar.h>
 #include <windows.h>
 #include <WindowsX.h>
 #include "../MMDPlugin/mmd_plugin.h"
