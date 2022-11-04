@@ -72,6 +72,7 @@ public:
 
 		m_menu.AddSeparator(CMenu::MmdMenu::Edit);
 		m_menu.Create(CMenu::MmdMenu::Edit, _T("外部親差し替え(&O)"), _T("swap outside parent(&O)")
+					, CMenu::InsertBottom
 					, [this](CMenu*) { OnMenuExec(); }
 					, [this](CMenu*m) {m->SetEnable(true); } ); // 常時選べる様にする
 	}

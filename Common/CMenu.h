@@ -15,8 +15,14 @@ class CMenu
 	HMENU						m_subMenuH;		// MMDのサブメニュー
 	UINT						m_id;			// メニューのID
 
+public:
+												// 末尾に追加する際の指定
+	static constexpr UINT InsertBottom = 0xffffffff;
+
 												// 日本語/英語の切り替えメニューID
 	static constexpr int JP_EN_MODE_CHANGE_MENU_ID = 0x104;
+												// 「WAVファイル読込(&W)」メニューID
+	static constexpr int LOAD_WAV_FILE_MENU_ID = 0x0CE;
 
 public:
 	CMenu() : m_subMenuH(nullptr), m_id(-1) {}
@@ -40,7 +46,7 @@ public:
 	};
 
 	// MMDのメニューに項目を追加する
-	void Create(MmdMenu addPos, const std::wstring &jpTitle, const std::wstring &enTitle, const std::function<void(CMenu*)> &onExec, const std::function<void(CMenu*)> &onDisp = nullptr)
+	void Create(MmdMenu addPos, const std::wstring &jpTitle, const std::wstring &enTitle, UINT insertPos, const std::function<void(CMenu*)> &onExec, const std::function<void(CMenu*)> &onDisp = nullptr)
 	{
 		m_jpTitle = jpTitle;
 		m_enTitle = enTitle;
@@ -62,17 +68,23 @@ public:
 			mii.dwTypeData = const_cast<LPWSTR>(mmdDataP->is_english_mode ? m_enTitle.c_str() : m_jpTitle.c_str());
 			mii.wID = m_id = createWM_APP_ID();
 
-			InsertMenuItem(m_subMenuH, mii.wID, FALSE, &mii);
+			InsertMenuItem(m_subMenuH, insertPos, (insertPos == InsertBottom), &mii);
 		}
 	}
 
 	// セパレーター追加
-	static void AddSeparator(MmdMenu addPos)
+	// insertPos		メニューIDを指定すると、そのIDの上に挿入される 未指定なら末尾に追加
+	static void AddSeparator(MmdMenu addPos, UINT insertPos = InsertBottom)
 	{
 		HMENU subMenuH = GetSubMenu(GetMenu(getHWND()), static_cast<int>(addPos));
 		if (subMenuH)
 		{
-			InsertMenu(subMenuH, 0xffffffff, MF_BYPOSITION | MF_SEPARATOR, 0, nullptr);
+			UINT	flags = MF_SEPARATOR;	// セパレータを指定
+
+			// メニューIDが指定されていなければ、位置指定にしておく(位置指定で位置が-1だと末尾追加になる)
+			if (insertPos == InsertBottom)	{ flags |= MF_BYPOSITION; }
+
+			InsertMenu(subMenuH, insertPos, flags, 0, nullptr);
 		}
 	}
 

@@ -47,6 +47,7 @@ public:
 
 		m_menu.AddSeparator(CMenu::MmdMenu::Edit);
 		m_menu.Create(CMenu::MmdMenu::Edit, _T("ｶﾒﾗのﾎﾞｰﾝ追従設定(&F)"), _T("set camera follow bone(&F)")
+					, CMenu::InsertBottom
 					, [this](CMenu*) { OnMenuExec(); }
 					, [this](CMenu*m) {m->SetEnable(m_mmdDataP->is_camera_edit_mode); } ); // カメラ編集モード時のみ選べる様にする
 	}
