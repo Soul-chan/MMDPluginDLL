@@ -19,7 +19,7 @@ public:
 	{
 		m_pThis = this;
 		// PostMessageのフック
-		m_postHookH = SetWindowsHookEx(WH_GETMESSAGE, PostMsgHookProc, module, 0);
+		m_postHookH = SetWindowsHookEx(WH_GETMESSAGE, PostMsgHookProc, module, GetCurrentThreadId());
 	}
 
 	// stop() から呼び出す
