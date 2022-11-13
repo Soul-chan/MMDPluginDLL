@@ -1297,7 +1297,7 @@ namespace mmp
     float length;				// 距離 表示されている数値に-1を掛けた値が入っている
     Float3 xyz;					// カメラ中心
     Float3 rxyz;				// 角度(ラジアン) X軸は+-反転
-    char hokan1_x[6];			// x, y, z, 回転, 距離, 視野角
+    char hokan1_x[6];			// 補間曲線操作 x, y, z, 回転, 距離, 視野角
     char hokan1_y[6];
     char hokan2_x[6];
     char hokan2_y[6];
@@ -1306,6 +1306,21 @@ namespace mmp
     int is_selected;			// 1で選択している。0で選択していない
     int looking_model_index;	// ボーン追従のモデルのインデックス なしの場合は-1
     int looking_bone_index;		// ボーンのインデックス 0～
+	
+	void SetLook(int m, int b)	{ looking_model_index = m; looking_bone_index = b; }
+	void ClearLook()			{ looking_model_index = -1; looking_bone_index = 0; }
+
+	// fromPを元にtoPを初期化する(リンクや選択状態等以外の情報をコピーする)
+	static void InitFrom(CameraKeyFrameData *toP, CameraKeyFrameData *fromP)
+	{
+		// MMDでキーフレームを打った時、補間曲線操作は前のフレームのものを引き継がないので、ここでも引き継がない
+		toP->xyz					= fromP->xyz;
+		toP->rxyz					= fromP->rxyz;
+		toP->is_perspective			= fromP->is_perspective;
+		toP->view_angle				= fromP->view_angle;
+		toP->looking_model_index	= fromP->looking_model_index;
+		toP->looking_bone_index		= fromP->looking_bone_index;
+	}
   };
   
   struct Color3
@@ -1368,6 +1383,13 @@ namespace mmp
     Float3 xyz;					// 位置
     Color3 rgb;					// 色 256が1.0f
     int is_selected;			// 1で選択している。0で選択していない
+
+	// fromPを元にtoPを初期化する(リンクや選択状態等以外の情報をコピーする)
+	static void InitFrom(LightKeyFrameData *toP, LightKeyFrameData *fromP)
+	{
+		toP->xyz		= fromP->xyz;
+		toP->rgb		= fromP->rgb;
+	}
   };
 
   // 24バイト
@@ -1387,6 +1409,13 @@ namespace mmp
     ModeType mode;				// モード
     float range;				// 影範囲 0.1 - (表示値 * 0.00001)
     int is_selected;			// 1で選択している。0で選択していない
+
+	// fromPを元にtoPを初期化する(リンクや選択状態等以外の情報をコピーする)
+	static void InitFrom(SelfShadowKeyFrameData *toP, SelfShadowKeyFrameData *fromP)
+	{
+		toP->mode		= fromP->mode;
+		toP->range		= fromP->range;
+	}
   };
 
   // 36バイト
@@ -1401,6 +1430,15 @@ namespace mmp
     char is_noise;				// ノイズ付加 1でON
     char is_selected;			// 1で選択している。0で選択していない
     char pad[2];				// パディング
+
+	// fromPを元にtoPを初期化する(リンクや選択状態等以外の情報をコピーする)
+	static void InitFrom(GravityKeyFrameData *toP, GravityKeyFrameData *fromP)
+	{
+		toP->accel		= fromP->accel;
+		toP->xyz		= fromP->xyz;
+		toP->noise		= fromP->noise;
+		toP->is_noise	= fromP->is_noise;
+	}
   };
 
   // 60バイト
@@ -1419,16 +1457,33 @@ namespace mmp
     Float3 rxyz;				// Rx Ry Rz
     float si;					// Si
     float tr;					// Tr
+	
+	void SetLook(int m, int b)	{ looking_model_index = m; looking_bone_index = b; }
+	void ClearLook()			{ looking_model_index = -1; looking_bone_index = 0; }
+	
+	// fromPを元にtoPを初期化する(リンクや選択状態等以外の情報をコピーする)
+	static void InitFrom(AccessoryKeyFrameData *toP, AccessoryKeyFrameData *fromP)
+	{
+		auto is_selected = toP->is_selected;
+		memcpy(&toP->is_visible, &fromP->is_visible, sizeof(AccessoryKeyFrameData) - offsetof(AccessoryKeyFrameData, is_visible));
+		toP->is_selected = is_selected;
+	}
   };
   
   struct MMDAccessoryData
   {
-    void* __unknown_pointer10[4];
+    void* __unknown_pointer10[4];// [2]にはテクスチャのフルパス(wchar_t)っぽいものが見える
     wchar_t dir_path[256];		// アクセサリの入っているフォルダ名
     int __unknown10[10];
     char name[100];				// ファイル名
     wchar_t file_path[256];		// ファイル名を含むパス
-    int __unknown40[8];
+	char __unknown40;
+	char render_order;			// アクセサリ描画順(アクセサリ設定の順番) 0～ アクセサリ操作のコンボボックスの並びはこれの昇順
+	char __unknown41[2];
+	int __unknown42[3];
+	char is_timeline_select;	// カメラモードのタイムラインでこのアクセサリの行が選択状態なら1
+	char pad[3];
+	int __unknown43[3];
   };
 
   struct BoneCurrentData
@@ -1586,6 +1641,18 @@ namespace mmp
 
   static_assert(sizeof(MorphCurrentData) == 192, "");
 
+  // モーフのタイムライン情報
+  struct MorphTimelineData
+  {
+	  char name_jp[20];
+	  char name_en[20];
+	  char __unknown0[4];
+	  char is_timeline_select;			// タイムラインのモーフ行選択状態(何故か MorphCurrentData に含まれずここにある?)
+	  char __unknown1;
+  };
+
+  static_assert(sizeof(MorphTimelineData) == 46, "");
+
   struct MMDModelData
   {
     int __unknown10[2224];
@@ -1599,7 +1666,8 @@ namespace mmp
     MorphCurrentData* morph_current_data;	// 表情モーフ情報の配列 [0]～[morph_count-1]まで
     int __unknown25[6];
     char keyframe_editor_toplevel_rows;
-    void* __unknown30[2];
+    void* __unknown30[1];
+	MorphTimelineData* morph_timeline_data;	// 表情モーフのタイムライン情報配列 [0]～[morph_count-1]まで
 
     struct BoneKeyFrame
     {
@@ -1613,6 +1681,14 @@ namespace mmp
       float x, y, z;						// X Y Z
       float rotation_q[4];
       int is_selected;						// 1で選択している。0で選択していない
+	  
+	// fromPを元にtoPを初期化する(リンクや選択状態等以外の情報をコピーする)
+      static void InitFrom(BoneKeyFrame *toP, BoneKeyFrame *fromP)
+      {
+      	auto is_selected = toP->is_selected;
+      	memcpy(&toP->interpolation_curve_x1, &fromP->interpolation_curve_x1, sizeof(BoneKeyFrame) - offsetof(BoneKeyFrame, interpolation_curve_x1));
+      	toP->is_selected = is_selected;
+      }
     };
     // [0]～[bone_count-1]までが各ボーンの0フレームのキーフレーム そこからリンクドリストでボーンのフレームが設定されている
     // 空きを探す場合は[bone_count]からフレーム番号(frame_no)が0の要素を探す
@@ -1625,6 +1701,12 @@ namespace mmp
       int next_index;						// 次のキーフレームがあるときに0以外になる
       float value;							// モーフ値
       char is_selected;						// 1で選択している。0で選択していない
+	  
+	// fromPを元にtoPを初期化する(リンクや選択状態等以外の情報をコピーする)
+      static void InitFrom(MorphKeyFrame *toP, MorphKeyFrame *fromP)
+      {
+      	toP->value = fromP->value;
+      }
     };
 	// [0]～[morph_count-1]までが各モーフの0フレームのキーフレーム そこからリンクドリストでモーフのフレームが設定されている
     // 空きを探す場合は[morph_count]からフレーム番号(frame_no)が0の要素を探す
@@ -1648,8 +1730,19 @@ namespace mmp
       struct RelationSetting
       {
         int parent_model_index;				// 外部親モデル -1:なし -2:地面 0～:モデルのインデックス
-        int parent_bone_index;				// 外部親ボーン
+        int parent_bone_index;				// 外部親ボーン モデルがなし/地面の場合は0が入っている
+		void Set(int m, int b)	{ parent_model_index = m; parent_bone_index = b; }
+		void Clear()			{ parent_model_index = -1; parent_bone_index = 0; }
       }*relation_setting;
+	  
+	// fromPを元にtoPを初期化する(リンクや選択状態等以外の情報をコピーする)
+      static void InitFrom(ConfigurationKeyFrame *toP, ConfigurationKeyFrame *fromP, MMDModelData *modelP)
+      {
+		toP->is_visible		= fromP->is_visible;
+		memcpy(toP->is_ik_enabled, fromP->is_ik_enabled, modelP->ik_count);
+		toP->__unknown		= fromP->__unknown;
+		memcpy(toP->relation_setting, fromP->relation_setting, modelP->parentable_bone_count * sizeof(RelationSetting));
+      }
 	};
 	ConfigurationKeyFrame(&configuration_keyframe)[1000];
 
@@ -1661,22 +1754,24 @@ namespace mmp
     char __unknown45;
     char is_visible;
     int selected_bone;
-    int __unknown50[4];
+    char *bone_timeline_select;				// タイムラインのボーン行選択状態配列 [0]～[bone_count-1]まで
+	int __unknown50[2];
     int selected_morph_indices[4];			// 「表情操作」で選択されているモーフの番号(番号はPmxEditorのモーフタブでの番号と同じ) [0]まゆ [1]目 [2]リップ [3]その他
     int __unknown59[257];
     int vscroll;
     int last_frame_number;
-    int __unknown60[150475];
+    int __unknown61[150475];                // [13]～は pmx のフルパス(wchar)や、その後ろにはトゥーンファイル名等が見える そのあとはゼロっぽい
     int parentable_bone_count;				// 外部親設定の「対象ボーン」数 configuration_keyframe->relation_setting の要素数
   };
 
   // ReSharper disable CppZeroConstantCanBeReplacedWithNullptr
-  static constexpr int a = offsetof(MMDModelData, selected_morph_indices);
+  static constexpr int a = offsetof(MMDModelData, parentable_bone_count );
   static_assert(8896 == offsetof(MMDModelData, name_jp), "");
   static_assert(10104 == offsetof(MMDModelData, keyframe_editor_toplevel_rows), "");
   static_assert(12560 == offsetof(MMDModelData, bone_count), "");
   static_assert(12572 == offsetof(MMDModelData, selected_bone), "");
   static_assert(12592 == offsetof(MMDModelData, selected_morph_indices), "");
+  static_assert(615544 == offsetof( MMDModelData, parentable_bone_count ), "");
   // ReSharper restore CppZeroConstantCanBeReplacedWithNullptr
 
   struct MMDMainData
@@ -1776,13 +1871,18 @@ namespace mmp
     char is_self_shadow_select;				// カメラモードのタイムラインで「セルフ影」行が選択状態なら1
     char is_gravity_select;					// カメラモードのタイムラインで「重力」行が選択状態なら1
     char __unknown109[124];
-    int __unknown110[320];
+	int __unknown110[67];
+	char accessory_timeline_select[200];	// カメラモードのタイムラインでアクセサリの行選択状態なら1 上下にスクロールするとその分ズレる(そのアクセサリ自身が選択されているかどうかは MMDAccessoryData の is_timeline_select を見ること) [0]が一番上(重力の1つ下)に表示されているアクセサリと言う事
+    int __unknown111[203];
     int output_size_x;
     int output_size_y;
     float length;
     unsigned char __unknown120[32];
     wchar_t pmm_path[256];					// MikuMikuDance.exe のパス
-    int __unknown130[27];
+	int __unknown130[10];
+	char accessory_draw_after_model;		// 「アクセサリ設定」の「X番目より後のアクセサリはモデル描写後に描写する」の値
+	char __unknown131[3];
+	int __unknown132[16];
     bool is_english_mode;					// 英語モードかどうか true:英語 false:日本語
   };
 

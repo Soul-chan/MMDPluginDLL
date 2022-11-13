@@ -14,6 +14,7 @@ class CMenu
 	std::function<void(CMenu*)>	m_onDisp;		// 表示されようとした時の実行関数
 	HMENU						m_subMenuH;		// MMDのサブメニュー
 	UINT						m_id;			// メニューのID
+	UINT						m_insertPos;	// メニューの挿入位置
 
 public:
 												// 末尾に追加する際の指定
@@ -52,6 +53,7 @@ public:
 		m_enTitle = enTitle;
 		m_onExec = onExec;
 		m_onDisp = onDisp;
+		m_insertPos = insertPos;
 
 		// 既に作成済みの場合は、何もする必要も無いが、一応文字列と実行関数だけ差し替えてみる
 		if (m_id != -1) { return; }

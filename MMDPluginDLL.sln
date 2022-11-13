@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32002.261
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CameraModeUndo", "CameraModeUndo\CameraModeUndo.vcxproj", "{765786C6-AB9C-432B-AF73-C122A3D5CCD0}"
 EndProject
@@ -16,6 +16,7 @@ Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "MikuMikuDance", "D:\MMD\Mik
 		UseLegacyDebugEngines = No
 		LaunchSQLEngine = No
 		AttachLaunchAction = No
+		IORedirection = Auto
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DispPlayingFrame", "DispPlayingFrame\DispPlayingFrame.vcxproj", "{CD53A5BB-422A-4A94-A803-FE78CBB82632}"
@@ -25,6 +26,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "Common\Common.vcxitems", "{45D41ACC-2C3C-43D2-BC10-02AA73FFC7C7}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SwapOutsideParent", "SwapOutsideParent\SwapOutsideParent.vcxproj", "{B650B635-B11B-4D9D-A2F6-17C00F6853D1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OutsideParentReaderWriter", "OutsideParentReaderWriter\OutsideParentReaderWriter.vcxproj", "{B2C6E864-AEB6-43C7-A56B-39AFA447ECB3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,8 +53,15 @@ Global
 		{B650B635-B11B-4D9D-A2F6-17C00F6853D1}.Debug|x64.Build.0 = Debug|x64
 		{B650B635-B11B-4D9D-A2F6-17C00F6853D1}.Release|x64.ActiveCfg = Release|x64
 		{B650B635-B11B-4D9D-A2F6-17C00F6853D1}.Release|x64.Build.0 = Release|x64
+		{B2C6E864-AEB6-43C7-A56B-39AFA447ECB3}.Debug|x64.ActiveCfg = Debug|x64
+		{B2C6E864-AEB6-43C7-A56B-39AFA447ECB3}.Debug|x64.Build.0 = Debug|x64
+		{B2C6E864-AEB6-43C7-A56B-39AFA447ECB3}.Release|x64.ActiveCfg = Release|x64
+		{B2C6E864-AEB6-43C7-A56B-39AFA447ECB3}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {989DC28C-626F-4AED-8875-870D7BEAC546}
 	EndGlobalSection
 EndGlobal

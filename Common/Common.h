@@ -9,3 +9,5 @@
 #include "../Common/CPostMsgHook.h"
 #include "../Common/CMenu.h"
 #include "../Common/CKeyFrameUtil.h"
+#include "../Common/CMMDDataUtil.h"
+#include "../Common/CCsv.h"
